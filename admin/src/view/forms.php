@@ -1,0 +1,58 @@
+<?php
+/**
+* @Copyright ((c) plasma-web.ru
+        * @license    GPLv2 or later
+        */
+
+namespace QuickForm;
+\defined('QF3_VERSION') or die;
+
+class viewHtml extends baseView
+{
+    protected $items;
+    protected $projectid;
+
+    public function __construct()
+    {
+        $this->projectid = (int) $this->get('projectid', $_GET);
+        if(! $this->projectid) {
+            echo '<script>document.location.href = "/wp-admin/admin.php?page=qf3-projects";</script>';
+            exit;
+        }
+        parent::__construct('forms');
+        $this->display();
+    }
+
+    public function display()
+    {
+        $this->items = $this->getItems();
+        $this->pagination = $this->getPagination();
+        $this->projectTitle  = $this->getModel()->geProjectTitle();
+
+        $this->addToolbar();
+        $this->addFilters();
+
+        parent::display();
+    }
+
+    protected function addToolbar()
+    {
+        echo $this->settitle('QuickForm. QF_FIELD_GROUPS id ' . $this->projectid);
+
+        $html = '<div class="qf3_toolbar">';
+        $html .= $this->toolbarBtn('form.add', 'QF_ADD_NEW', ' green');
+        $html .= $this->toolbarBtn('forms.delete', 'Delete', ' red');
+        $html .= $this->toolbarBtn('forms.help', 'Help', '');
+        $html .= '</div>';
+        echo $html;
+    }
+
+    protected function addFilters()
+    {
+        $html = '<div class="qf3_filters">';
+        $html .= $this->filtersearch('forms.search');
+        $html .= $this->filter('forms.limit', [''=>'12', 24=>'24', 48=>'48']);
+        $html .= '</div>';
+        echo $html;
+    }
+}
