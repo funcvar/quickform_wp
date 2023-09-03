@@ -2,7 +2,7 @@
 Contributors: var x
 Tags: forms, contact form, free forms, ajax form, popup contact, ajax cart, step by step, modal form, calculator, e-commerce, cart, form
 Requires at least: 2.7
-Tested up to: 6.2
+Tested up to: 6.3
 Stable tag: 3.3.02
 License: GPLv2 or later
 
