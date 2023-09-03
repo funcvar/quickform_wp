@@ -5,6 +5,7 @@
         */
 
 namespace QuickForm;
+
 \defined('QF3_VERSION') or die;
 
 class controller
@@ -99,11 +100,8 @@ class controller
     }
 
     protected function check($mod = 'shopmod') {
-        $config = new qf_config();
-        $qfparams = (object) $config->getconfig();
-
         if($mod == 'form') {
-            if ($qfparams->cors) {
+            if (qf::conf()->get('cors')) {
               header("Access-Control-Allow-Origin: *");
             }
             require_once(QF3_PLUGIN_DIR . 'classes/buildform.php');
@@ -112,14 +110,14 @@ class controller
             require_once QF3_PLUGIN_DIR . 'classes/buildemail.php';
             return new qfFilds;
         } elseif($mod == 'filesmod') {
-            if (! $qfparams->filesmod) {
+            if (! qf::conf()->get('filesmod')) {
                 return exit('attachment disabled');
             }
             require_once QF3_PLUGIN_DIR . 'classes/attachment.php';
             return new qfAttachment;
         }
 
-        if (! $qfparams->shopmod) {
+        if (! qf::conf()->get('shopmod')) {
             return exit('shopmod disabled');
         }
         require_once QF3_PLUGIN_DIR . 'classes/qfcart.php';

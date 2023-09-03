@@ -12,7 +12,7 @@ require_once __DIR__.'/buildemail.php';
 
 class qfCart extends qfFilds
 {
-    public $shopParams;
+    public $shop;
     public $attachment;
     protected $cart;
     protected $ses;
@@ -22,10 +22,10 @@ class qfCart extends qfFilds
         parent::__construct();
 
         $this->cart = qf::ses()->get('qfcartbox', []);
-        $this->shopParams = $this->config->getShopParams();
+        $this->shop = qf::conf()->get('', 'shop');
 
-        if (qf::get('filesmod', $this->qf_params)) {
-            $this->attachment = $this->shopParams['addfiles'];
+        if (qf::conf()->get('filesmod')) {
+            $this->attachment = $this->shop['addfiles'];
         }
     }
 
@@ -57,17 +57,17 @@ class qfCart extends qfFilds
             }
 
             if(sizeof($arr) == 1) {
-                $sum = round($arr[$currency], (int) $this->shopParams['fixed']);
+                $sum = round($arr[$currency], (int) $this->shop['fixed']);
                 $sum = $this->format($sum);
-                $sum = $this->shopParams['pcsdir'] ? $currency.' '.$sum : $sum.' '.$currency;
+                $sum = $this->shop['pcsdir'] ? $currency.' '.$sum : $sum.' '.$currency;
             } else {
                 $sum = sizeof($this->cart);
             }
 
-            $html .=  '<span class="qf_h qf_cart_pcs">'.Text::translate($this->shopParams['pcs']).'</span><span class="qf_h qf_cart_sum">'.$sum.'</span>';
+            $html .=  '<span class="qf_h qf_cart_pcs">'.Text::translate($this->shop['pcs']).'</span><span class="qf_h qf_cart_sum">'.$sum.'</span>';
         }
 
-        if ($path = $this->shopParams['img']) {
+        if ($path = $this->shop['img']) {
             if (strpos($path, 'cart_0.png')) {
                 $i = sizeof($this->cart);
                 $path = str_replace('cart_0', 'cart_'.(($i>3) ? 3 : $i), $path);
@@ -85,7 +85,7 @@ class qfCart extends qfFilds
 
     public function checkcss()
     {
-        if($id = (int) $this->shopParams['contacts']) {
+        if($id = (int) $this->shop['contacts']) {
             require_once __DIR__.'/buildform.php';
             $QuickForm = new QuickForm();
             $project = $QuickForm->getProjectById($id);
@@ -99,8 +99,8 @@ class qfCart extends qfFilds
 
     protected function format($sum)
     {
-        $fix = (int) $this->shopParams['fixed'];
-        $fo =  (int) $this->shopParams['format'];
+        $fix = (int) $this->shop['fixed'];
+        $fo =  (int) $this->shop['format'];
 
         if(! $fo) {
             return number_format($sum, $fix, ',', ' ');
@@ -158,7 +158,7 @@ class qfCart extends qfFilds
                     if ($sumsize > 1) {
                         $html .= $sum[1]->label.' ';
                     }
-                    $sum[0] = round($sum[0], (int) $this->shopParams['fixed']);
+                    $sum[0] = round($sum[0], (int) $this->shop['fixed']);
                     $html .= $this->format($sum[0]) . ' ' . $sum[1]->unit.'<br>';
                 }
             } else {
@@ -173,7 +173,7 @@ class qfCart extends qfFilds
 
             $html .= '<td style="white-space: nowrap">';
             if ($sumsize == 1) {
-                $sum = round($row['sum'][0][0], (int) $this->shopParams['fixed']);
+                $sum = round($row['sum'][0][0], (int) $this->shop['fixed']);
                 $currency = $row['sum'][0][1]->unit;
                 $html .= $this->format($row['qt']*$sum) . ' ' . $currency;
                 if (! isset($rowssum[$currency])) {
@@ -224,7 +224,7 @@ class qfCart extends qfFilds
             $promocod = qf::ses()->get('qfpromocod', '');
 
             if ($promocod) {
-                $codes = preg_replace('/\s/', '', $this->shopParams['promocod']);
+                $codes = preg_replace('/\s/', '', $this->shop['promocod']);
                 $codes = preg_split('/([^&%]+[&%])/', $codes, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
                 foreach ($codes as $cod) {
                     $pats = explode('-', $cod);
@@ -247,8 +247,8 @@ class qfCart extends qfFilds
                         break;
                     }
                 }
-            } elseif ($this->shopParams['discounts']) {
-                $codes = preg_replace('/[^0-9\-%&]/', '', $this->shopParams['discounts']);
+            } elseif ($this->shop['discounts']) {
+                $codes = preg_replace('/[^0-9\-%&]/', '', $this->shop['discounts']);
                 $codes = preg_split('/([^&%]+[&%])/', $codes, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
 
                 foreach ($codes as $cod) {
@@ -291,7 +291,7 @@ class qfCart extends qfFilds
                 $html .= '<td style="white-space: nowrap">';
 
                 if ($row['sum'] && sizeof($row['sum']) == 1) {
-                    $sum = round($row['sum'][0][0], (int) $this->shopParams['fixed']);
+                    $sum = round($row['sum'][0][0], (int) $this->shop['fixed']);
                     $currency = $row['sum'][0][1]->unit;
                     $html .= $this->format($sum) . ' ' . $currency;
                     if (! isset($rowssum[$currency])) {
@@ -307,7 +307,7 @@ class qfCart extends qfFilds
 
         $html .= '<tr><td colspan="2"><br></td></tr>';
         $html .= '<tr>';
-        $html .= '<td><b>'.$this->shopParams['text_2'].'</b></td>';
+        $html .= '<td><b>'.$this->shop['text_2'].'</b></td>';
         $html .= '<td style="white-space: nowrap">';
         foreach ($rowssum as $currency=>$sum) {
             $html .= '<b>'.$this->format($sum).' '.$currency.'</b><br>';
@@ -317,7 +317,7 @@ class qfCart extends qfFilds
 
         $html .= '</table>';
 
-        $html = $this->shopParams['text_before'] . $html . $this->shopParams['text_after'];
+        $html = $this->shop['text_before'] . $html . $this->shop['text_after'];
         $html = Text::translate($html);
 
         $project = $this->defProject();
@@ -325,11 +325,11 @@ class qfCart extends qfFilds
         $this->iscart = true;
         $this->back = false;
 
-        if($this->shopParams['back']) {
-            if (! qf::get('backlogin', $this->shopParams)) {
+        if($this->shop['back']) {
+            if (! qf::get('backlogin', $this->shop)) {
                 $this->back = qf::user()->get('email');
             } else {
-                if($confirm && $this->qf_params['display'] == 2) {
+                if($confirm && qf::conf()->get('display') == 2) {
                     foreach ($confirm as $row) {
                         if($this->back) {
                             break;
@@ -347,8 +347,8 @@ class qfCart extends qfFilds
                 }
             }
 
-            $vizual = ! qf::get('backmod', $this->shopParams);
-            if(($vizual && ! qf::get('backfl', $_POST)) || ! $this->qf_params['cod']) {
+            $vizual = ! qf::get('backmod', $this->shop);
+            if(($vizual && !qf::get('backfl', $_POST)) || !qf::conf()->get('cod')) {
                 $this->back = false;
             }
         }
@@ -365,7 +365,7 @@ class qfCart extends qfFilds
             $this->cartredirect($link);
         }
 
-        $this->msg = Text::translate($this->shopParams['popmess']);
+        $this->msg = Text::translate($this->shop['popmess']);
         $this->msgtype = 'message';
 
         qf::ses()->set('qfcartbox', []);
@@ -373,8 +373,8 @@ class qfCart extends qfFilds
         qf::ses()->set('qfcartimg', []);
         qf::ses()->set('qfpromocod', '');
 
-        if ($this->shopParams['redirect']) {
-            $link = $this->shopParams['redirect'];
+        if ($this->shop['redirect']) {
+            $link = $this->shop['redirect'];
         }
 
         $this->cartredirect($link);
@@ -394,10 +394,10 @@ class qfCart extends qfFilds
         $project = new \stdClass();
         $project->id = 0;
         $project->params = new \stdClass();
-        $project->params->history = $this->shopParams['history'];
+        $project->params->history = $this->shop['history'];
 
-        $project->params->toemail = $this->shopParams['toemail'];
-        $project->params->subject = $this->shopParams['subject'];
+        $project->params->toemail = $this->shop['toemail'];
+        $project->params->subject = $this->shop['subject'];
 
         if (! $project->params->subject) {
             $project->params->subject = $_SERVER['HTTP_HOST'] .' '. Text::_('QF_ORDER') . ' №' .time();
@@ -426,13 +426,13 @@ class qfCart extends qfFilds
 
         $aid = array();
 
-        if ($v = $this->shopParams['payment']) {
+        if ($v = $this->shop['payment']) {
             $aid[0] = $v;
         }
-        if ($v = $this->shopParams['delivery']) {
+        if ($v = $this->shop['delivery']) {
             $aid[1] = $v;
         }
-        if ($v = $this->shopParams['contacts']) {
+        if ($v = $this->shop['contacts']) {
             $aid[2] = $v;
         }
 
@@ -504,7 +504,7 @@ class qfCart extends qfFilds
     public function pageCart()
     {
         $html = '';
-        $script = '<script>var qf_cart_fixed='.(int) $this->shopParams['fixed'].', qf_cart_format='.(int) $this->shopParams['format'].';';
+        $script = '<script>var qf_cart_fixed='.(int) $this->shop['fixed'].', qf_cart_format='.(int) $this->shop['format'].';';
         $rowssum = array();
 
         if (! $this->cart) {
@@ -516,7 +516,7 @@ class qfCart extends qfFilds
             $attachment = new qfAttachment();
         }
 
-        $html .= $this->shopParams['text_before_cart'];
+        $html .= $this->shop['text_before_cart'];
 
         $html .= '<table>';
 
@@ -544,7 +544,7 @@ class qfCart extends qfFilds
                     if ($sumsize > 1) {
                         $html .= $sum[1]->label.' ';
                     }
-                    $sum[0] = round($sum[0], (int) $this->shopParams['fixed']);
+                    $sum[0] = round($sum[0], (int) $this->shop['fixed']);
                     $html .= $this->format($sum[0]) . ' ' . $sum[1]->unit.'<br>';
                 }
             } else {
@@ -558,7 +558,7 @@ class qfCart extends qfFilds
             $html .= '<td class="qf_td_6">';
 
             if ($sumsize == 1) {
-                $sum = round($row['sum'][0][0], (int) $this->shopParams['fixed']);
+                $sum = round($row['sum'][0][0], (int) $this->shop['fixed']);
                 $currency = $row['sum'][0][1]->unit;
                 $html .= $this->format($row['qt']*$sum) . ' ' . $currency;
 
@@ -591,11 +591,11 @@ class qfCart extends qfFilds
         }
         // end files
 
-        $html .= $this->shopParams['text_after_cart_1'];
+        $html .= $this->shop['text_after_cart_1'];
 
         // discounts
-        $promocod = trim($this->shopParams['promocod']);
-        $discounts = trim($this->shopParams['discounts']);
+        $promocod = trim($this->shop['promocod']);
+        $discounts = trim($this->shop['discounts']);
 
         if ($discounts || $promocod) {
             $script .= 'var qf_txt_discount="QF_DISCOUNT";';
@@ -650,7 +650,7 @@ class qfCart extends qfFilds
         $html .= '</div>';
         $html .= '</div>';
 
-        $html .= $this->shopParams['text_after_cart_2'];
+        $html .= $this->shop['text_after_cart_2'];
 
         return Text::translate($html);
     }
@@ -660,7 +660,7 @@ class qfCart extends qfFilds
     public function qfcartpromocod()
     {
         $usercod = \sanitize_text_field($this->get('cod', $_POST));
-        $codes = preg_replace('/\s/', '', $this->shopParams['promocod']);
+        $codes = preg_replace('/\s/', '', $this->shop['promocod']);
         $codes = preg_split('/([^&%]+[&%])/', $codes, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
 
         foreach ($codes as $cod) {
@@ -678,8 +678,8 @@ class qfCart extends qfFilds
     protected function boxSubmit()
     {
         $html = '<div class="qf_cart_btn">';
-        if ($id = $this->shopParams['contacts']) {
-            $html .= '<input name="qfcartnext2" type="button" class="btn qfcartsubmit" value="' . $this->shopParams['text_3'] . '" onclick="QFcart.cartnext()" />';
+        if ($id = $this->shop['contacts']) {
+            $html .= '<input name="qfcartnext2" type="button" class="btn qfcartsubmit" value="' . $this->shop['text_3'] . '" onclick="QFcart.cartnext()" />';
         } else {
             $html .= $this->boxSubmitS();
         }
@@ -692,9 +692,9 @@ class qfCart extends qfFilds
     protected function boxSubmitS()
     {
         $html = '';
-        if($this->shopParams['back']) {
-            $vizual = ! qf::get('backmod', $this->shopParams);
-            $loginonly = ! qf::get('backlogin', $this->shopParams);
+        if($this->shop['back']) {
+            $vizual = ! qf::get('backmod', $this->shop);
+            $loginonly = ! qf::get('backlogin', $this->shop);
 
             if ($vizual) {
                 if ($loginonly) {
@@ -728,12 +728,12 @@ class qfCart extends qfFilds
                 }
             }
         }
-        return '<form method="post" class="cart_form">'.$html.'<input name="task" type="hidden" value="qfcartsubmit"><input name="root" type="hidden" value="'.qf::getUrl().'"><input name="option" type="hidden" value="com_qf3"><input name="qfcartsubmit" type="button" class="qfcartsubmit" value="' . $this->shopParams['text_4'] . '" onclick="QFcart.cartsubmit(this.form)" /></form>';
+        return '<form method="post" class="cart_form">'.$html.'<input name="task" type="hidden" value="qfcartsubmit"><input name="root" type="hidden" value="'.qf::getUrl().'"><input name="option" type="hidden" value="com_qf3"><input name="qfcartsubmit" type="button" class="qfcartsubmit" value="' . $this->shop['text_4'] . '" onclick="QFcart.cartsubmit(this.form)" /></form>';
     }
 
     protected function checkuseremailfield()
     {
-        $ids = [$this->shopParams['contacts'], $this->shopParams['delivery'], $this->shopParams['payment']];
+        $ids = [$this->shop['contacts'], $this->shop['delivery'], $this->shop['payment']];
         foreach ($ids as $id) {
             if ((int) $id) {
                 $data = $this->linerData($this->getData($id));
@@ -750,13 +750,13 @@ class qfCart extends qfFilds
     {
         $html = '';
         if ($rowssum) {
-            $html .= '<h3>'.$this->shopParams['text_1'].'</h3>';
+            $html .= '<h3>'.$this->shop['text_1'].'</h3>';
         }
 
-        $html .= '<div id="qf_resultprice" data-text_price_total="'.$this->shopParams['text_2'].'">';
+        $html .= '<div id="qf_resultprice" data-text_price_total="'.$this->shop['text_2'].'">';
         foreach ($rowssum as $unit=>$sum) {
-            $sum = round($sum, (int) $this->shopParams['fixed']);
-            $html .= '<div class="qf_preresultprice"><label>'.$this->shopParams['text_5'].'</label><span class="qfpriceinner">'.$this->format($sum).'</span><span class="qfunitinner">'.$unit.'</span></div>';
+            $sum = round($sum, (int) $this->shop['fixed']);
+            $html .= '<div class="qf_preresultprice"><label>'.$this->shop['text_5'].'</label><span class="qfpriceinner">'.$this->format($sum).'</span><span class="qfunitinner">'.$unit.'</span></div>';
             $html .= '<input name="qfprice[]" type="hidden" value="'.$sum.'" data-unit="'.$unit.'" />';
         }
         $html .= '</div>';
@@ -769,7 +769,7 @@ class qfCart extends qfFilds
     {
         $html = '';
 
-        if ($id = $this->shopParams[$name]) {
+        if ($id = $this->shop[$name]) {
             require_once __DIR__.'/buildform.php';
             $QuickForm = new QuickForm();
 
@@ -788,7 +788,7 @@ class qfCart extends qfFilds
     {
         $html = '';
 
-        if ($id = $this->shopParams['contacts']) {
+        if ($id = $this->shop['contacts']) {
             require_once __DIR__.'/buildform.php';
             $QuickForm = new QuickForm();
 

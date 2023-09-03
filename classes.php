@@ -53,8 +53,7 @@ class Text
         return $lng;
     }
 
-    public static function translate($text)
-    {
+    public static function translate($text) {
         return preg_replace_callback('/\b(QF_\w+)\b/', function ($m) {
             return self::_($m[1]);
         }, $text);
@@ -64,19 +63,7 @@ class Text
 
 class qf_config
 {
-    public $settingsFile;
-    public $shopsettingsFile;
-    public $qfparams;
-    public $shopParams;
-
-    public function __construct()
-    {
-        $this->settingsFile = QF3_ADMIN_DIR . 'src/configs/settings.php';
-        $this->shopsettingsFile = QF3_ADMIN_DIR . 'src/configs/shop.php';
-    }
-
-    public function getItems($file)
-    {
+    public function getItems($file) {
         if (file_exists($file)) {
             $data = json_decode(include $file);
             foreach ($data as $k => &$v) {
@@ -86,29 +73,26 @@ class qf_config
         }
     }
 
-    protected function config($xml, $file)
-    {
+    protected function config($xml, $file) {
         $xml = simplexml_load_file($xml);
         $arr = $this->XMLToArray($xml);
 
         $config = (array) $this->getItems($file);
-        if (!$config) {
+        if (! $config) {
             return $arr;
         }
 
-        foreach ($arr as $key => $value) {
-            if (!isset($config[$key])) {
-                $config[$key] = $value;
+        foreach ($arr as $key => $def) {
+            if (! isset($config[$key])) {
+                $config[$key] = $def;
             }
         }
-        $key = isset($config['cod']) ? $config['cod'] : '';
-        qf::gl('key', $key);
+        qf::gl('key', qf::get('cod', $config));
 
         return $config;
     }
 
-    protected function XMLToArray($xml)
-    {
+    protected function XMLToArray($xml) {
         $arr = array();
         foreach ($xml as $k => $v) {
             if ((is_object($v) || is_array($v)) && ($k != 'field')) {
@@ -125,22 +109,17 @@ class qf_config
         return $arr;
     }
 
-    public function getconfig()
-    {
-        if (!isset($this->qfparams)) {
-            $xml = QF3_ADMIN_DIR . 'forms/settings.xml';
-            $this->qfparams = $this->config($xml, $this->settingsFile);
-        }
-        return $this->qfparams;
+    public function getpath($fname = 'settings') {
+        return QF3_ADMIN_DIR . 'src/configs/'.$fname.'.php';
     }
 
-    public function getShopParams()
-    {
-        if (!isset($this->shopParams)) {
-            $xml = QF3_ADMIN_DIR . 'forms/shop.xml';
-            $this->shopParams = $this->config($xml, $this->shopsettingsFile);
+    public function get($name='', $fname='settings', $def='') {
+        if (! $cfg = qf::gl($fname)) {
+            $xml = QF3_ADMIN_DIR . 'forms/'.$fname.'.xml';
+            $cfg = $this->config($xml, $this->getpath($fname));
+            qf::gl($fname, $cfg);
         }
-        return $this->shopParams;
+        return $name ? qf::get($name, $cfg, $def) : $cfg;
     }
 }
 
@@ -212,27 +191,27 @@ class qf_user
 
 class qf
 {
-    public static function form($id)
-    {
+    public static function form($id) {
         require_once(QF3_PLUGIN_DIR . 'classes/buildform.php');
         $qf = new QuickForm();
         return $qf->getQuickForm($id);
     }
 
-    public static function cart($headonly)
-    {
+    public static function cart($headonly) {
         require_once(QF3_PLUGIN_DIR . 'classes/buildform.php');
         $qf = new QuickForm();
         return $qf->getShopModule($headonly);
     }
 
-    public static function ses()
-    {
+    public static function conf() {
+        return new qf_config();
+    }
+
+    public static function ses() {
         return new qf_session();
     }
 
-    public static function user()
-    {
+    public static function user() {
         return new qf_user();
     }
 
@@ -241,8 +220,7 @@ class qf
         return 'w'.\get_bloginfo('version');
     }
 
-    public static function addScript($type, $file)
-    {
+    public static function addScript($type, $file) {
         if ($type == 'css') {
             \wp_enqueue_style($file, QF3_PLUGIN_URL . 'site/assets/' . $file, array(), QF3_VERSION);
         } elseif ($type == 'js') {
@@ -250,64 +228,47 @@ class qf
         }
     }
 
-    public static function getlang()
-    {
+    public static function getlang() {
         return str_replace('-', '_', (string) \get_locale());
     }
 
-    public static function getacs()
-    {
+    public static function getacs() {
         return array(''=>'QF_ACCESS') + \wp_roles()->role_names;
     }
 
-    public static function gettask($var = 'task', $def = '')
-    {
+
+    public static function gettask($var = 'task', $def = '') {
         if (isset($_REQUEST[$var])) {
             return preg_replace('/[^a-z.\d\-_]/i', '', $_REQUEST[$var]);
         }
         return $def;
     }
 
-    public static function gl($k, $v = false)
-    {
+    public static function gl($k, $v = false) {
         if($v !== false) {
             $GLOBALS['qf3'][$k] = $v;
         } else {
-            return isset($GLOBALS['qf3'][$k]) ? $GLOBALS['qf3'][$k] : 0;
+            return isset($GLOBALS['qf3'][$k]) ? $GLOBALS['qf3'][$k] : '';
         }
     }
 
-    public static function getUrl()
-    {
+    public static function getUrl() {
         return ((! empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
     }
 
-    public static function formatPrice($field, $math, $label='')
-    {
-        $pos = isset($field->pos) ? $field->pos : '';
-        $unit = isset($field->unit) ? $field->unit : '';
-        $format = isset($field->format) ? $field->format : '';
-        $fixed = isset($field->fixed) ? $field->fixed : 0;
-        if (! $math) {
-            $unit = '';
-            $math = '';
-        } else {
-            if (! $format) {
-                $math = number_format($math, (int) $fixed, ',', ' ');
-            } elseif ($format == 1) {
-                $math = number_format($math, (int) $fixed, '.', ',');
-            } else {
-                $math = number_format($math, (int) $fixed, '.', '');
-            }
-        }
+    public static function formatPrice($field, $math, $label='') {
+        $arr = [0=>[',', ' '], 1=>['.', ','], 2=>['.', '']];
+        $ar = $arr[(int) self::get('format', $field, 0)];
+        $math = number_format($math, (int) self::get('fixed', $field, 0), $ar[0], $ar[1]);
 
-        $price = $label ? '<span>'.$label.'</span>' : '';
-        $price .= $pos ? '<span class="adderprice">'.$math.'</span> <span class="adderunit">'.$unit.'</span>' : '<span class="adderunit">'.$unit.'</span> <span class="adderprice">'.$math.'</span>';
-        return $price;
+        $label = $label ? '<span>'.$label.'</span>' : '';
+        $math = '<span class="adderprice">'.$math.'</span>';
+        $unit = '<span class="adderunit">'.self::get('unit', $field).'</span>';
+
+        return $label.(self::get('pos', $field) ? $math.' '.$unit : $unit.' '.$math);
     }
 
-    public static function get($v, $obj, $def = '')
-    {
+    public static function get($v, $obj, $def = '') {
         $obj = (object) $obj;
         if (! isset($obj->$v)) {
             if (isset($obj->custom) && strpos($obj->custom, $v) !== false) {
@@ -328,5 +289,6 @@ class qf
         }
         return $obj->$v;
     }
+
 
 }

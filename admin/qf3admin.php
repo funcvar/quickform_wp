@@ -71,9 +71,6 @@ class qf_admin
 
     public function register_menus()
     {
-        $config = new qf_config();
-        $params = $config->getconfig();
-
         \add_menu_page(
             Text::_('QF_PROJECT_MANAGER'),
             'QuickForm',
@@ -93,7 +90,7 @@ class qf_admin
             array( $this->controller, 'display' )
         );
 
-        if($this->get('shopmod', $params)) {
+        if(qf::conf()->get('shopmod')) {
             \add_submenu_page(
                 'qf3-projects',
                 Text::_('QF_SHOP_SETTINGS'),
@@ -104,7 +101,7 @@ class qf_admin
             );
         }
 
-        if($this->get('filesmod', $params)) {
+        if(qf::conf()->get('filesmod')) {
             \add_submenu_page(
                 'qf3-projects',
                 Text::_('QF_ATTACHMENT_SETTINGS'),

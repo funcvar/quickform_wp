@@ -224,12 +224,9 @@ class Form extends qf_admin
             $html .= $desk;
 
         } elseif ($type == 'disabledfiles') {
-            $conf = new qf_config();
-            $qf_config = $conf->getconfig();
-
             $dis = 'class="custom-select"';
 
-            if (!$this->get('filesmod', $qf_config)) {
+            if (! qf::conf()->get('filesmod')) {
                 $dis = 'class="custom-select" disabled';
                 $value = 0;
             }
@@ -244,11 +241,9 @@ class Form extends qf_admin
             $options = $model->statusfields();
             $html .= $this->listfield($name, $options, $value);
         } elseif ($type == 'backcart') {
-            $conf = new qf_config();
-            $qf_config = $conf->getconfig();
             $dis = '';
 
-            if (! $qf_config['cod'] || $qf_config['display'] != 2) {
+            if (qf::conf()->get('display') != 2 || !qf::gl('key')) {
                 $dis = 'disabled';
                 $value = 0;
             }

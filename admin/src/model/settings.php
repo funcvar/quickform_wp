@@ -15,11 +15,10 @@ class settingsModel extends baseModel
     public function __construct()
     {
         $this->closelink = 'projects';
-        $this->config = new qf_config();
     }
 
     public function getItems() {
-        return $this->config->getItems($this->config->settingsFile);
+        return qf::conf()->getItems(qf::conf()->getpath());
     }
 
     public function save() {
@@ -30,7 +29,7 @@ class settingsModel extends baseModel
                 $v = stripslashes($v);
             }
             $cod = '<?php return \''.json_encode($data, (JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_NUMERIC_CHECK)) . '\';';
-            file_put_contents($this->config->settingsFile, $cod);
+            file_put_contents(qf::conf()->getpath(), $cod);
         }
         else $this->errors[] =  'empty data';
     }

@@ -9,15 +9,11 @@ namespace QuickForm;
 
 class QuickForm
 {
-  protected $config;
-  protected $qfparams;
   protected $ajaxquery;
   public $project;
 
     public function __construct()
     {
-        $this->config = new qf_config();
-        $this->qfparams = $this->config->getconfig();
         $this->ajaxquery = strpos(qf::get('task', $_POST), 'ajax') === 0;
     }
 
@@ -27,15 +23,13 @@ class QuickForm
         $qfcart = new qfCart();
 
         if(! $this->ajaxquery) {
-            $shopParams = $this->config->getShopParams();
-
-            if ($shopParams['cartcss'] != 'none') {
-                qf::addScript('css', 'shopcart/'.$shopParams['cartcss']);
+            if (qf::conf()->get('cartcss', 'shop') != 'none') {
+                qf::addScript('css', 'shopcart/'.qf::conf()->get('cartcss', 'shop'));
             }
             $qfcart->checkcss();
 
             qf::addScript('js', 'js/qf3.js');
-            qf::addScript('js', 'shopcart/'.$shopParams['cartjs']);
+            qf::addScript('js', 'shopcart/'.qf::conf()->get('cartjs', 'shop'));
         }
 
         if(! $headonly) {
@@ -453,9 +447,9 @@ class QuickForm
 
     protected function recaptcha($field, $id)
     {
-        if (qf::user()->get('guest') || ! qf::get('recaptcha_show', $this->qfparams)) {
-            $pubkey = qf::get('sitekey', $this->qfparams);
-            $theme = qf::get('recaptcha_theme', $this->qfparams);
+        if (qf::user()->get('guest') || ! qf::conf()->get('recaptcha_show')) {
+            $pubkey = qf::conf()->get('sitekey');
+            $theme = qf::conf()->get('recaptcha_theme');
             if (! $pubkey) {
                 return 'PLG_RECAPTCHA_ERROR_NO_PUBLIC_KEY';
             }
@@ -582,7 +576,7 @@ class QuickForm
 
       $guest =qf::user()->get('guest');
       $pos = qf::get('pos', $field);
-      $unlogged = qf::get('unlogged', $this->qfparams);
+      $unlogged = qf::conf()->get('unlogged');
       $uniqid = uniqid($field->fieldid);
       $label = qf::get('label', $field);
 
@@ -1185,9 +1179,9 @@ class QuickForm
     {
         $cl = '';
         $lang = '';
-        if (qf::get('display', $this->qfparams) == '2' && trim(qf::get('cod', $this->qfparams))) {
-            return '<input name="qfcod" type="hidden" value="' . trim(qf::get('cod', $this->qfparams)) . '" />';
-        } elseif (qf::get('display', $this->qfparams) == '1') {
+        if (qf::conf()->get('display') == '2' && trim(qf::conf()->get('cod'))) {
+            return '<input name="qfcod" type="hidden" value="' . trim(qf::conf()->get('cod')) . '" />';
+        } elseif (qf::conf()->get('display') == '1') {
             $cl = ' nfl';
         }
 

@@ -23,7 +23,7 @@ global $wpdb;
         margin-left: 0;
     }
 </style>
-<script>var qffilesmod = <?php echo $this->get('filesmod', $this->qfparams)?>,qfcde=<?php echo $this->get('cod', $this->qfparams, 0)?1:0?>,qfshopmod=<?php echo $this->get('shopmod', $this->qfparams)?>;</script>
+<script>var qffilesmod = <?php echo qf::conf()->get('filesmod')?>,qfcde=<?php echo qf::conf()->get('cod')?1:0?>,qfshopmod=<?php echo qf::conf()->get('shopmod')?>;</script>
 
 <div class="qf_form_style_form">
 <form method="post" name="qfadminform" class="formstyle" autocomplete="off">
@@ -56,14 +56,14 @@ global $wpdb;
                             }
                         }
                         else{
-                          $inplab = '<div class="qfsmoll"></div><input name="qfllabel" type="text" value="'.htmlspecialchars($label).'" class="qflabelclass" />';
+                            $inplab = '<div class="qfsmoll"></div><input name="qfllabel" type="text" value="'.htmlspecialchars($label).'" class="qflabelclass" />';
                         }
 
                         $html .= '<tr data-settings="'.htmlentities(json_encode($row), ENT_QUOTES, 'UTF-8').'"><td class="l_td">'.$inplab;
                         if($options){
                             $html .= '<div class="optionsBox hid">';
                             foreach($options as $option){
-                              $label = htmlspecialchars($option->label);
+                                $label = htmlspecialchars($option->label);
                                 unset($option->label);
                                 $html .= '<div class="optionRow" data-settings="'.htmlentities(json_encode($option), ENT_QUOTES, 'UTF-8').'"><input name="qfoption" type="text" value="'.$label.'" /><a href="#" class="setting"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a><a href="#" class="plus"><i class="fa fa-plus" aria-hidden="true"></i></a><a href="#" class="delete"><i class="fa fa-times" aria-hidden="true"></i></a></div>';
                             }
