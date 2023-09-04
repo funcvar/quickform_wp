@@ -5,12 +5,14 @@
         */
 
 namespace QuickForm;
+
 \defined('QF3_VERSION') or die;
 
 class viewHtml extends baseView
 {
     protected $items;
     protected $projectid;
+    protected $projectTitle;
 
     public function __construct()
     {
@@ -26,8 +28,8 @@ class viewHtml extends baseView
     public function display()
     {
         $this->items = $this->getItems();
-        $this->pagination = $this->getPagination();
-        $this->projectTitle  = $this->getModel()->geProjectTitle();
+        // $this->pagination = $this->getPagination();
+        $this->projectTitle  = $this->getModel()->getProjectTitle();
 
         $this->addToolbar();
         $this->addFilters();
@@ -51,7 +53,6 @@ class viewHtml extends baseView
     {
         $html = '<div class="qf3_filters">';
         $html .= $this->filtersearch('forms.search');
-        $html .= $this->filter('forms.limit', [''=>'12', 24=>'24', 48=>'48']);
         $html .= '</div>';
         echo $html;
     }

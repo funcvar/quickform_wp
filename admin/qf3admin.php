@@ -53,9 +53,9 @@ class qf_admin
     public function getLanguages()
     {
         $new[''] =  'Language';
-        $languages = get_available_languages();
+        $languages = \get_available_languages();
         require_once ABSPATH . 'wp-admin/includes/translation-install.php';
-        $translations = wp_get_available_translations();
+        $translations = \wp_get_available_translations();
         foreach($languages as $language) {
             $lang = str_replace('-', '_', $language);
             $new[$lang] = $translations[$language]['native_name'];
@@ -150,9 +150,9 @@ class qf_admin
       	';
 
         $key = 'qfinline';
-        wp_register_style($key, false, array(), true, true);
-        wp_add_inline_style($key, $styles);
-        wp_enqueue_style($key);
+        \wp_register_style($key, false, array(), true, true);
+        \wp_add_inline_style($key, $styles);
+        \wp_enqueue_style($key);
     }
 
     public function loadstyles() {

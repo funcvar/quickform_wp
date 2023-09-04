@@ -41,7 +41,7 @@ class controller extends qf_admin {
     $arr = explode ('.', $this->task);
     $page = $arr[0];
     $task = isset($arr[1]) ? $arr[1] : '';
-    if (strpos ($task, 'edit') !== false) {
+    if (in_array ($task, array('edit', 'add'))) {
       \add_action ('admin_init', static function () {
         $GLOBALS['menu'] = array();
       });

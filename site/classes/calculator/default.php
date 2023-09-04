@@ -5,7 +5,6 @@
         */
 
 namespace QuickForm;
-
 \defined('QF3_VERSION') or die;
 
 class qfCalculator_tmpl extends qfCalculator
@@ -20,10 +19,10 @@ class qfCalculator_tmpl extends qfCalculator
 
         try {
             $sum = eval('$res=('. $str .');return $res;');
-        } catch (Throwable $t) {
+        } catch (\Throwable $t) {
             $sum = 0;
             parent::qfErrormes('calculator error: '.$str);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $sum = 0;
             parent::qfErrormes('calculator error: '.$str);
         }

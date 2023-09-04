@@ -112,7 +112,7 @@ class projectModel extends baseModel
             preg_match('/[a-z0-9_]+/i', $pats[0], $matches);
 
             if ($matches[0] != $pats[0]) {
-                $this->errors[] = 'File not created. Invalid file name: '.$pats[0].'.css';
+                $this->errors[] = 'File not created. Invalid file name: '.htmlspecialchars($pats[0]).'.css';
                 return false;
             }
 

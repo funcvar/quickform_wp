@@ -84,6 +84,7 @@ class formsModel extends baseModel
         return $this->treeHtml($this->getTree($arr));
     }
 
+
     public function treeHtml($tree, $i = -1) {
       static $repeat = [];
       $i++; $d = '';
@@ -137,8 +138,7 @@ class formsModel extends baseModel
     }
 
 
-
-    public function geProjectTitle()
+    public function getProjectTitle()
     {
         global $wpdb;
 

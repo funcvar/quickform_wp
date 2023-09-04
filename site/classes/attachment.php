@@ -305,8 +305,8 @@ class qfAttachment extends qfCart
     protected function getwhitelist()
     {
         $whitelist = array();
-        if ($this->shopParams['accept'] == 1) {
-            $whitelist = $this->shopParams['whitelist'];
+        if ($this->shop['accept'] == 1) {
+            $whitelist = $this->shop['whitelist'];
             $whitelist = preg_replace('/\s/', '', $whitelist);
             $whitelist = explode(',', $whitelist);
         }
@@ -331,7 +331,7 @@ class qfAttachment extends qfCart
                 $whitelist = '';
             }
 
-            if ($this->shopParams['reqfiles'] == 1) {
+            if ($this->shop['reqfiles'] == 1) {
                 $req = ' data-req="1"';
                 $whitelist .= ' *';
             } else {
@@ -383,7 +383,7 @@ class qfAttachment extends qfCart
         $html .= '</tr>';
         $html .= '</table>';
 
-        if ($this->shopParams['reqfiles'] == 1) {
+        if ($this->shop['reqfiles'] == 1) {
             if (! $fl) {
                 return 'ERR_REQ_FILES';
             }
