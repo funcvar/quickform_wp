@@ -3,7 +3,7 @@ Contributors: var x
 Tags: forms, contact form, free forms, ajax form, popup contact, ajax cart, step by step, modal form, calculator, e-commerce, cart, form
 Requires at least: 2.7
 Tested up to: 6.3
-Stable tag: 3.3.02
+Stable tag: 3.3.03
 License: GPLv2 or later
 
 Compact form builder. Creates dynamic forms, calculators, online stores, cloneable fields, tree structures, polls, quizzes, support forms, step-by-step forms and more.
@@ -16,9 +16,11 @@ This plugin is aimed at those who want to create a beautiful form with their own
 
 This is a really fast plugin that does not slow down the site. You can put many different forms on one page and you won't notice any braking.
 
-= Translation =
-* Russian (ru-RU)
-* English (en-GB)
+== Translations ==
+* English - default
+* Russian - on
+* French - on
+* Spanish - on
 
 
 == Screenshots ==
