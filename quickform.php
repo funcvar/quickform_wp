@@ -1,10 +1,10 @@
 <?php
 /**
  * Plugin Name:      QuickForm
- * Version:           3.3.02
- * Author:            varx
+ * Version:           3.3.03
+ * Author:            var x
  * Description:       Cool Form Builder.
- * Author URI:        https://plasma-web.ru
+ * Author URI:        https://plasma-web.ru/en/
  * Requires PHP:      5.5
  * License: GPLv2 or later
  */
